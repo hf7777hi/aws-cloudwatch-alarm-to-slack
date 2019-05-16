@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  cloudwatch-alarm-to-slack
+
+  Sample SAM Template for cloudwatch-alarm-to-slack
+
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        TZ: Asia/Tokyo
+        STAGE: PROD
+        WEBHOOK_URL: https://hooks.slack.com/services/
+        SLACK_CHANNEL: cloudwatch-alarm
+        ENCRYPTED_INCOMING_TOKEN: 
+Resources:
+  CloudwatchAlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: cloudwatch-alarm-to-slack
+      DisplayName: cloudwatch-alarm-to-slack
+  CloudwatchAlarmFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: cloudwatch-alarm-to-slack
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        Alarm:
+          Type: SNS
+          Properties:
+            Topic: !Ref CloudwatchAlarmTopic
+  
+  # Sample Cloudwatch Alarm
+  ApiCountAlarm:
+    Type: AWS::CloudWatch::Alarm # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html
+    Properties:
+      AlarmName: SampleApiCount
+      # ActionsEnabled: Boolean
+      AlarmActions:
+        - !Ref CloudwatchAlarmTopic
+      InsufficientDataActions:
+        - !Ref CloudwatchAlarmTopic
+      OKActions:
+        - !Ref CloudwatchAlarmTopic
+      # DatapointsToAlarm: Integer
+      # Dimensions:
+      #   - Dimension
+      # EvaluateLowSampleCountPercentile: String
+      # ExtendedStatistic: String
+      MetricName: Count
+      # Metrics:  
+      #   - MetricDataQuery
+      Namespace: AWS/Api­Gateway
+      Period: 3600
+      Statistic: Sum
+      Threshold: 60
+      ComparisonOperator: GreaterThanThreshold
+      # TreatMissingData: String
+      Unit: Count
+      EvaluationPeriods: 1

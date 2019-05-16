@@ -1,0 +1,13 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1::ExampleTopic",
+      "Sns": {
+        "Type": "Notification",
+        "Message": "{\"AlarmName\": \"Example\",\"NewStateValue\": \"ExampleAlart\",\"NewStateReason\": \"ExampleError\"}"
+      }
+    }
+  ]
+}
