@@ -12,9 +12,12 @@ Globals:
       Variables:
         TZ: Asia/Tokyo
         STAGE: PROD
-        WEBHOOK_URL: https://hooks.slack.com/services/
         SLACK_CHANNEL: cloudwatch-alarm
-        ENCRYPTED_INCOMING_TOKEN: 
+        ENCRYPTED_INCOMING_URL: 
+        OK: ":ok:"
+        ALARM: ":ng:"
+        INSUFFICIENT_DATA: ":question:"
+        EXCEPTION: ":rotating_light:"
 Resources:
   CloudwatchAlarmTopic:
     Type: AWS::SNS::Topic
@@ -38,27 +41,22 @@ Resources:
   ApiCountAlarm:
     Type: AWS::CloudWatch::Alarm # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html
     Properties:
-      AlarmName: SampleApiCount
-      # ActionsEnabled: Boolean
+      Namespace: AWS/Api­Gateway
+      MetricName: Count
+      Dimensions:
+        - Name: ApiName
+          Value: SampleApi
+      Period: 300
+      Statistic: Average
+      AlarmName: Sample
+      AlarmDescription: Sample
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Threshold: 0
+      EvaluationPeriods: 1
+      TreatMissingData: notBreaching
+      OKActions:
+        - !Ref CloudwatchAlarmTopic
       AlarmActions:
         - !Ref CloudwatchAlarmTopic
       InsufficientDataActions:
         - !Ref CloudwatchAlarmTopic
-      OKActions:
-        - !Ref CloudwatchAlarmTopic
-      # DatapointsToAlarm: Integer
-      # Dimensions:
-      #   - Dimension
-      # EvaluateLowSampleCountPercentile: String
-      # ExtendedStatistic: String
-      MetricName: Count
-      # Metrics:  
-      #   - MetricDataQuery
-      Namespace: AWS/Api­Gateway
-      Period: 3600
-      Statistic: Sum
-      Threshold: 60
-      ComparisonOperator: GreaterThanThreshold
-      # TreatMissingData: String
-      Unit: Count
-      EvaluationPeriods: 1

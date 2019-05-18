@@ -1,4 +1,4 @@
-# cloudwatch-alarm-to-slack
+# aws-cloudwatch-alarm-to-slack
 
 ディレクトリ構成は以下の通りになってます。
 
@@ -14,6 +14,7 @@
 
 ## 環境
 以下インストール済みであること
+
 * [Python 3 installed](https://www.python.org/downloads/)
 * [aws-sam-cli](https://pypi.org/project/aws-sam-cli/)
 * [Docker installed](https://www.docker.com/community-edition)
@@ -22,11 +23,19 @@
 
 ## 設定
 * SLACK_CHANNEL : 投稿するslackのチャンネル名を設定ください。
-* ENCRYPTED_INCOMING_TOKEN : 以下コマンドにて暗号化したtokenを設定ください。
+* ENCRYPTED_INCOMING_URL : 以下コマンドにて暗号化したtokenを設定ください。
 
+```bash
+$ aws kms encrypt --key-id alias/[key名] --plaintext "[token(https://以下の部分)]"
 ```
-$ aws kms encrypt --key-id alias/[key名] --plaintext "[token(https://hooks.slack.com/services/以下の部分)]"
-```
+
+template.yamlの以下をslackの絵文字にカスタマイズしてください(デフォルト値が設定されています)。
+
+* OK → CloudwatchアラートがOKになった時に通知される絵文字
+* ALARM → CloudwatchアラートがNGになった時に通知される絵文字
+* INSUFFICIENT_DATA → Cloudwatchアラートが不足した時に通知される絵文字
+* EXCEPTION → コード実行時に例外が発生した時に通知される絵文字
+
 
 ## テスト実行
 
@@ -34,7 +43,14 @@ $ aws kms encrypt --key-id alias/[key名] --plaintext "[token(https://hooks.slac
 sam local invoke --e event.json
 ```
 
-テスト実行する際は、event.jsonのMessageを変更で可能です。
+テスト実行する際は、event.jsonのMessageを変更してください。
+NewStateValueの値がアラート状態によって以下のように変わります。
+
+* アラート時 : ALARM
+* OK時 : OK
+* 不足時 : INSUFFICIENT_DATA
+
+これらをevent.jsonのMessageにすればそれぞれのアラートの状態のテストが可能です。
 
 ## アラーム設定
 template.yamlに設定するか、ソースをデプロイした後手動で設定してください。
@@ -66,6 +82,8 @@ sam deploy \
     --stack-name cloudwatch-alarm-to-slack \
     --capabilities CAPABILITY_IAM
 ```
+
+デプロイ後は、**KMSのキーユーザーにCloudFormationで作成されたロールを許可してください。**
 
 
 

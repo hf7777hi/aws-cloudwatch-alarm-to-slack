@@ -6,7 +6,7 @@
       "EventSubscriptionArn": "arn:aws:sns:us-east-1::ExampleTopic",
       "Sns": {
         "Type": "Notification",
-        "Message": "{\"AlarmName\": \"Example\",\"NewStateValue\": \"ExampleAlart\",\"NewStateReason\": \"ExampleError\"}"
+        "Message": "{\"AlarmName\":\"Hogehoge\",\"AlarmDescription\":null,\"AWSAccountId\":\"0000000\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 datapoint [0.4667407613208132 (16/05/19 13:19:00)] was greater than or equal to the threshold (0.0).\"}"
       }
     }
   ]
